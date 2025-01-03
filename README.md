@@ -1,99 +1,88 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+Gallardo Aguilar Aldo Daniel
+Tecnologías Utilizadas
+Node.js: Entorno de ejecución para JavaScript.
+NestJS: Framework para crear aplicaciones del lado del servidor.
+TypeORM: ORM para trabajar con bases de datos relacionales, en este caso PostgreSQL.
+PostgreSQL: Sistema de gestión de bases de datos.
+HTML5: Para la creación del front-end.
+Git: Sistema de control de versiones para gestionar el código fuente.
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+He utilizado:
+https://postgres.new/ -> Herramienta que facilita creación de bases de datos postgres y diagramado
+CREATE TABLE products (
+    id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    name TEXT NOT NULL,
+    description TEXT,
+    price DECIMAL(10, 2) NOT NULL,
+    stock INT NOT NULL
+);
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+CREATE TABLE carts (
+    id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    user_id BIGINT NOT NULL,
+    creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
-## Description
+CREATE TABLE cart_items (
+    id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    cart_id BIGINT REFERENCES carts(id) ON DELETE CASCADE,
+    product_id BIGINT REFERENCES products(id),
+    quantity INT NOT NULL
+);
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+CREATE TABLE orders (
+    id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    user_id BIGINT NOT NULL,
+    order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    total DECIMAL(10, 2) NOT NULL
+);
 
-## Project setup
+CREATE TABLE order_items (
+    id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    order_id BIGINT REFERENCES orders(id) ON DELETE CASCADE,
+    product_id BIGINT REFERENCES products(id),
+    quantity INT NOT NULL,
+    unit_price DECIMAL(10, 2) NOT NULL
+);
+El almacenamiento en **cookies** permite que los items del carrito persistan entre sesiones, incluso si el usuario no está autenticado. Esto facilita que el usuario regrese y continúe su compra sin perder los productos añadidos. Además, reduce la carga en el servidor al mantener los datos localmente en el navegador.
 
-```bash
+Utilizar cookies también mejora la experiencia del usuario al permitir la interacción con el carrito sin necesidad de iniciar sesión. Si el usuario se autentica, los productos del carrito se pueden asociar a su cuenta. Las cookies, además, son fáciles de implementar y ofrecen un rendimiento eficiente para la gestión del carrito.
+
+Descripción
+Este proyecto es una aplicación de comercio electrónico básica donde los usuarios pueden gestionar productos, carritos y pedidos. La aplicación está construida utilizando el framework NestJS para el back-end y PostgreSQL como base de datos. La comunicación con la base de datos se realiza a través de TypeORM, un ORM (Object Relational Mapper) que permite trabajar con bases de datos de manera eficiente y sencilla.
+
+Configuración del Proyecto
+Instalación de Dependencias
+Para instalar las dependencias necesarias, ejecuta el siguiente comando:
+
 $ npm install
-```
+Compilar y Ejecutar el Proyecto
+Puedes ejecutar el proyecto en diferentes modos:
 
-## Compile and run the project
-
-```bash
-# development
+# Modo desarrollo
 $ npm run start
 
-# watch mode
+# Modo desarrollo con reinicio automático (watch mode)
 $ npm run start:dev
 
-# production mode
+# Modo producción
 $ npm run start:prod
-```
 
-## Run tests
+Lógica de la Solución
+Este proyecto está diseñado para permitir la gestión de productos, carritos y pedidos. La base de datos está estructurada de la siguiente manera:
 
-```bash
-# unit tests
-$ npm run test
+Productos: Almacena información sobre los productos disponibles para la venta (nombre, descripción, precio, stock).
+Carritos: Los usuarios pueden agregar productos a un carrito. Cada carrito se asocia a un usuario.
+Pedidos: Cuando el usuario decide realizar la compra, los productos del carrito se transforman en un pedido, con detalles de cada producto y su precio.
+Las relaciones entre las tablas son las siguientes:
 
-# e2e tests
-$ npm run test:e2e
+productos: Contiene los productos disponibles.
+carritos: Relacionados con los usuarios.
+items_carrito: Relacionados con los productos dentro de un carrito.
+pedidos: Contiene los detalles de cada pedido realizado.
+items_pedido: Relacionados con los productos en un pedido.
 
-# test coverage
-$ npm run test:cov
-```
-
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ npm install -g mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+Recursos
+Documentación oficial de NestJS.
+Documentación oficial de PostgreSQL.
+Licencia
